@@ -23,4 +23,33 @@ class Cache():
 
         return random_key_str
 
-    def get(self, key: str, fn: Optional[Callable])
+    def get_str(self, key: str) -> str:
+        """Retrieves a string from Redis."""
+        # Retrieve the value from Redis
+        value = self._redis.get(key)
+        if value is None:
+            return None
+        # Convert bytes to string
+        return value.decode('utf-8')
+
+    def get_int(self, key: str) -> int:
+        """Retrieves an integer from Redis."""
+        # Retrieve the value from Redis
+        value = self._redis.get(key)
+        if value is None:
+            return None
+        # Convert bytes to integer
+        return int(value)
+
+    def get(self, key: str, fn: Optional[Callable[[bytes], Union[str, int, float]]] = None) -> Union[str, float, int, None]:
+        """Retrieves data from Redis and applies an optional conversion function."""
+        # Get the data from Redis
+        value = self._redis.get(key)
+        if value is None:
+            return None
+
+        # If a conversion function is provided, apply it
+        if fn:
+            return fn(value)
+
+        return value
